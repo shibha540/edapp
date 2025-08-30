@@ -10,8 +10,9 @@ import type { Problem } from '@/lib/data';
 import { Badge } from './ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
+import Link from 'next/link';
 
-export function ProblemCard({ problem }: { problem: Problem }) {
+export function ProblemCard({ problem, isDetailPage = false }: { problem: Problem, isDetailPage?: boolean }) {
   const { toast } = useToast();
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(problem.likes);
@@ -72,7 +73,11 @@ export function ProblemCard({ problem }: { problem: Problem }) {
                     <Share2 className="h-4 w-4" /> {problem.shares}
                 </Button>
             </div>
-            <Button onClick={() => showToast('viewing solutions')}>View Solutions</Button>
+            {!isDetailPage && (
+              <Button asChild>
+                <Link href={`/problem/${problem.id}`}>View Solutions</Link>
+              </Button>
+            )}
         </div>
       </CardFooter>
     </Card>
