@@ -43,16 +43,22 @@ export function AIHintGenerator() {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onloadend = async () => {
-        const base64data = reader.result as string;
-        const response = await aiPoweredHintsForProblems({ problemImage: base64data });
-        setHints(response.hints);
+        try {
+          const base64data = reader.result as string;
+          const response = await aiPoweredHintsForProblems({ problemImage: base64data });
+          setHints(response.hints);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'An unknown error occurred.');
+        } finally {
+          setIsLoading(false);
+        }
       };
       reader.onerror = () => {
         setError('Failed to read the file.');
+        setIsLoading(false);
       };
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
-    } finally {
       setIsLoading(false);
     }
   };
