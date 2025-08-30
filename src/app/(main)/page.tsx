@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { problems as initialProblems, type Problem } from "@/lib/data";
@@ -11,6 +11,11 @@ import { PostProblemDialog } from '@/components/post-problem-dialog';
 export default function DashboardPage() {
   const [problems, setProblems] = useState<Problem[]>(initialProblems);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleAddNewProblem = (newProblem: Omit<Problem, 'id' | 'likes' | 'commentsCount' | 'shares'>) => {
     const problemToAdd: Problem = {
@@ -32,11 +37,13 @@ export default function DashboardPage() {
           <span>Post a Problem</span>
         </Button>
       </div>
-      <PostProblemDialog 
-        isOpen={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onProblemSubmit={handleAddNewProblem}
-      />
+      {isClient && (
+        <PostProblemDialog 
+          isOpen={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          onProblemSubmit={handleAddNewProblem}
+        />
+      )}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {problems.map((problem) => (
           <ProblemCard key={problem.id} problem={problem} />
