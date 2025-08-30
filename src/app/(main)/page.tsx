@@ -49,12 +49,12 @@ export default function DashboardPage() {
   };
 
   return (
-    <>
+    <div className="space-y-4 pb-16 md:pb-0">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Community Problems</h1>
         <Button className="flex items-center gap-2" onClick={() => setIsDialogOpen(true)}>
           <PlusCircle className="h-4 w-4" />
-          <span>Post a Problem</span>
+          <span>Post Problem</span>
         </Button>
       </div>
       {isClient && (
@@ -64,7 +64,7 @@ export default function DashboardPage() {
           onProblemSubmit={handleAddNewProblem}
         />
       )}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filteredProblems.map((problem) => (
           <ProblemCard key={problem.id} problem={problem} />
         ))}
@@ -78,6 +78,6 @@ export default function DashboardPage() {
             </p>
         </div>
       )}
-    </>
+    </div>
   );
 }
