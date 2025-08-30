@@ -43,7 +43,12 @@ export default function ProblemDetailsPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <ProblemCard problem={problem} isDetailPage />
+      <Card>
+        <CardContent className="p-0">
+          <ProblemCard problem={problem} isDetailPage />
+        </CardContent>
+      </Card>
+      
       <Card>
         <CardHeader>
           <CardTitle>Solutions ({mockSolutions.length})</CardTitle>

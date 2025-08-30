@@ -5,12 +5,13 @@ import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, MessageCircle, Share2 } from 'lucide-react';
+import { Heart, MessageCircle, Share2, ArrowRight } from 'lucide-react';
 import type { Problem } from '@/lib/data';
 import { Badge } from './ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 export function ProblemCard({ problem, isDetailPage = false }: { problem: Problem, isDetailPage?: boolean }) {
   const { toast } = useToast();
@@ -34,7 +35,7 @@ export function ProblemCard({ problem, isDetailPage = false }: { problem: Proble
   };
 
   return (
-    <Card className="flex flex-col">
+    <Card className={cn("flex flex-col", isDetailPage && "border-0 shadow-none")}>
       <CardHeader className="flex flex-row items-center gap-4">
         <Avatar>
           <AvatarImage src={problem.user.avatar} alt={problem.user.name} />
@@ -62,7 +63,7 @@ export function ProblemCard({ problem, isDetailPage = false }: { problem: Proble
       <CardFooter className="flex flex-col items-start gap-4">
         <Badge variant="secondary">{problem.category}</Badge>
         <div className="w-full flex justify-between items-center">
-            <div className="flex gap-4 text-muted-foreground">
+            <div className="flex gap-1 text-muted-foreground">
                 <Button variant="ghost" size="sm" className="flex items-center gap-2" onClick={handleLike}>
                     <Heart className={`h-4 w-4 ${isLiked ? 'text-red-500 fill-current' : ''}`} /> {likes}
                 </Button>
@@ -74,8 +75,8 @@ export function ProblemCard({ problem, isDetailPage = false }: { problem: Proble
                 </Button>
             </div>
             {!isDetailPage && (
-              <Button asChild>
-                <Link href={`/problem/${problem.id}`}>View Solutions</Link>
+              <Button asChild size="sm">
+                <Link href={`/problem/${problem.id}`}>View Solutions <ArrowRight className="ml-2 h-4 w-4" /></Link>
               </Button>
             )}
         </div>
