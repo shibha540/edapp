@@ -62,7 +62,7 @@ export function ProblemCard({ problem, isDetailPage = false }: { problem: Proble
       </CardContent>
       <CardFooter className="flex flex-col items-start gap-4">
         <Badge variant="secondary">{problem.category}</Badge>
-        <div className="w-full flex justify-between items-center">
+        <div className="w-full flex justify-between items-center text-sm">
             <div className="flex gap-1 text-muted-foreground">
                 <Button variant="ghost" size="sm" className="flex items-center gap-2" onClick={handleLike}>
                     <Heart className={`h-4 w-4 ${isLiked ? 'text-red-500 fill-current' : ''}`} /> {likes}
@@ -75,8 +75,8 @@ export function ProblemCard({ problem, isDetailPage = false }: { problem: Proble
                 </Button>
             </div>
             {!isDetailPage && (
-              <Button asChild size="sm">
-                <Link href={`/problem/${problem.id}`}>View Solutions <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              <Button asChild variant="ghost" size="sm" className="text-primary hover:text-primary">
+                <Link href={`/problem/${problem.id}`}>View <ArrowRight className="ml-1 h-4 w-4" /></Link>
               </Button>
             )}
         </div>
