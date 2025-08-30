@@ -19,13 +19,16 @@ export function AIHintGenerator() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (file) {
-      const objectUrl = URL.createObjectURL(file);
-      setPreview(objectUrl);
-
-      // Free memory when the component is unmounted
-      return () => URL.revokeObjectURL(objectUrl);
+    if (!file) {
+      setPreview('');
+      return;
     }
+
+    const objectUrl = URL.createObjectURL(file);
+    setPreview(objectUrl);
+
+    // Free memory when the component is unmounted
+    return () => URL.revokeObjectURL(objectUrl);
   }, [file]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
