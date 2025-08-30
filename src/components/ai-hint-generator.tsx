@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Lightbulb, Upload, Loader2, AlertCircle } from 'lucide-react';
 import { aiPoweredHintsForProblems } from '@/ai/flows/ai-powered-hints-for-problems';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import { Skeleton } from './ui/skeleton';
 
 export function AIHintGenerator() {
   const [hints, setHints] = useState('');
@@ -17,6 +18,11 @@ export function AIHintGenerator() {
   const [preview, setPreview] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (!file) {
@@ -74,6 +80,29 @@ export function AIHintGenerator() {
       setIsLoading(false);
     }
   };
+
+  if (!isClient) {
+    return (
+        <Card className="max-w-2xl mx-auto">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Lightbulb className="h-6 w-6 text-primary" />
+                    AI-Powered Hints
+                </CardTitle>
+                <CardDescription>
+                    Upload an image of a math problem or code error, and our AI will provide helpful hints to get you started.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-20 w-full" />
+            </CardContent>
+            <CardFooter>
+                <Skeleton className="h-10 w-full" />
+            </CardFooter>
+        </Card>
+    );
+  }
 
   return (
     <Card className="max-w-2xl mx-auto">
