@@ -1,5 +1,10 @@
+
+'use client';
+
 import Link from "next/link";
 import { Home, Lightbulb, Newspaper, Trophy, Search, Menu, BookOpen } from "lucide-react";
+import { useRouter, useSearchParams } from 'next/navigation';
+import type {FormEvent} from 'react';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,12 +12,27 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { UserNav } from "@/components/user-nav";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const navItems = [
     { href: "/", label: "Dashboard", icon: Home },
     { href: "/ai-hints", label: "AI Hints", icon: Lightbulb },
     { href: "/news", label: "News & Updates", icon: Newspaper },
     { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
   ];
+
+  const handleSearch = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const searchQuery = formData.get('search') as string;
+    if(searchQuery.trim()){
+      router.push(`/?q=${encodeURIComponent(searchQuery)}`);
+    } else {
+      router.push('/');
+    }
+  };
+
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -72,13 +92,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </SheetContent>
           </Sheet>
           <div className="w-full flex-1">
-            <form>
+            <form onSubmit={handleSearch}>
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
+                  name="search"
                   placeholder="Search problems..."
                   className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
+                  defaultValue={searchParams.get('q') ?? ''}
                 />
               </div>
             </form>
