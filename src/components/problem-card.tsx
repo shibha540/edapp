@@ -1,3 +1,6 @@
+
+'use client';
+
 import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -5,8 +8,30 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Heart, MessageCircle, Share2 } from 'lucide-react';
 import type { Problem } from '@/lib/data';
 import { Badge } from './ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 
 export function ProblemCard({ problem }: { problem: Problem }) {
+  const { toast } = useToast();
+  const [isLiked, setIsLiked] = useState(false);
+  const [likes, setLikes] = useState(problem.likes);
+
+  const handleLike = () => {
+    if (isLiked) {
+      setLikes(likes - 1);
+    } else {
+      setLikes(likes + 1);
+    }
+    setIsLiked(!isLiked);
+  };
+
+  const showToast = (feature: string) => {
+    toast({
+      title: 'Feature not implemented',
+      description: `The ${feature} functionality will be available soon!`,
+    });
+  };
+
   return (
     <Card className="flex flex-col">
       <CardHeader className="flex flex-row items-center gap-4">
@@ -37,17 +62,17 @@ export function ProblemCard({ problem }: { problem: Problem }) {
         <Badge variant="secondary">{problem.category}</Badge>
         <div className="w-full flex justify-between items-center">
             <div className="flex gap-4 text-muted-foreground">
-                <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                    <Heart className="h-4 w-4" /> {problem.likes}
+                <Button variant="ghost" size="sm" className="flex items-center gap-2" onClick={handleLike}>
+                    <Heart className={`h-4 w-4 ${isLiked ? 'text-red-500 fill-current' : ''}`} /> {likes}
                 </Button>
-                <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" className="flex items-center gap-2" onClick={() => showToast('comments')}>
                     <MessageCircle className="h-4 w-4" /> {problem.commentsCount}
                 </Button>
-                <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" className="flex items-center gap-2" onClick={() => showToast('sharing')}>
                     <Share2 className="h-4 w-4" /> {problem.shares}
                 </Button>
             </div>
-            <Button>View Solutions</Button>
+            <Button onClick={() => showToast('viewing solutions')}>View Solutions</Button>
         </div>
       </CardFooter>
     </Card>
