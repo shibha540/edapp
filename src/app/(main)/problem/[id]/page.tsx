@@ -15,10 +15,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, MessageSquare } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ProblemDetailsPage() {
   const params = useParams();
   const problemId = params.id as string;
+  const { toast } = useToast();
 
   const problem = problems.find((p) => p.id === problemId);
 
@@ -27,6 +29,14 @@ export default function ProblemDetailsPage() {
   }
 
   const solutions = problem.solutions || [];
+
+  const showToast = (feature: string) => {
+    toast({
+      title: 'Feature not implemented',
+      description: `The ${feature} functionality will be available soon!`,
+    });
+  };
+
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -64,7 +74,7 @@ export default function ProblemDetailsPage() {
                   <div className="prose prose-sm dark:prose-invert mt-2" dangerouslySetInnerHTML={{ __html: solution.content.replace(/\n/g, '<br />').replace(/`([^`]+)`/g, '<code>$1</code>') }} />
 
                   <div className="mt-4 flex items-center gap-4">
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={() => showToast('commenting on solutions')}>
                        <MessageSquare className="mr-2 h-4 w-4" /> Comment
                     </Button>
                   </div>
