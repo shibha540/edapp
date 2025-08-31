@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import {Part} from 'genkit';
 
 const FollowUpOnExplanationInputSchema = z.object({
   history: z.array(z.object({
@@ -16,6 +17,9 @@ const FollowUpOnExplanationInputSchema = z.object({
     content: z.string(),
   })).describe('The conversation history.'),
   question: z.string().describe('The follow-up question from the user.'),
+  problemImage: z.string().optional().describe(
+    "A photo of a math problem or code error, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'. This is only provided for the AI Hints feature."
+    ),
 });
 export type FollowUpOnExplanationInput = z.infer<typeof FollowUpOnExplanationInputSchema>;
 
@@ -34,9 +38,11 @@ const followUpOnExplanationFlow = ai.defineFlow(
     inputSchema: FollowUpOnExplanationInputSchema,
     outputSchema: FollowUpOnExplanationOutputSchema,
   },
-  async ({ history, question }) => {
+  async ({ history, question, problemImage }) => {
+    
+    const promptParts: Part[] = [];
 
-    const prompt = `You are a helpful AI assistant. The user asked a question and you provided a response. Now, they have a follow-up question.
+    promptParts.push({text: `You are a helpful AI assistant. The user asked a question and you provided a response. Now, they have a follow-up question.
     
 Here is the conversation history:
 {{#each history}}
@@ -46,10 +52,15 @@ Here is the conversation history:
 
 New follow-up question from user: ${question}
 
-Your task is to answer the follow-up question based on the context of the conversation. Be concise and helpful.`;
+Your task is to answer the follow-up question based on the context of the conversation. Be concise and helpful.`});
     
+    if (problemImage) {
+        promptParts.push({text: '\n\nHere is the original problem image for context:'});
+        promptParts.push({media: {url: problemImage}});
+    }
+
     const { output } = await ai.generate({
-      prompt,
+      prompt: promptParts,
       history: history.map(h => ({ role: h.role, content: [{ text: h.content }]})),
       output: {
         schema: FollowUpOnExplanationOutputSchema,

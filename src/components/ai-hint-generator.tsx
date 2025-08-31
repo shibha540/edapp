@@ -23,6 +23,7 @@ export function AIHintGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [problemImageBase64, setProblemImageBase64] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState('');
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -74,6 +75,7 @@ export function AIHintGenerator() {
         reader.onloadend = async () => {
           try {
             const base64data = reader.result as string;
+            setProblemImageBase64(base64data); // Save for follow-ups
             const response = await aiPoweredHintsForProblems({ problemImage: base64data });
             const aiResponse: Message = { role: 'model', content: response.hints };
             setMessages(prev => [...prev, aiResponse]);
@@ -100,7 +102,11 @@ export function AIHintGenerator() {
 
         try {
             const history = messages.map(m => ({ role: m.role, content: m.content }));
-            const response = await followUpOnExplanation({ history, question: inputValue });
+            const response = await followUpOnExplanation({ 
+              history, 
+              question: inputValue,
+              problemImage: problemImageBase64 || undefined,
+            });
             const aiResponse: Message = { role: 'model', content: response.answer };
             setMessages(prev => [...prev, aiResponse]);
         } catch (err) {
@@ -109,6 +115,13 @@ export function AIHintGenerator() {
             setIsLoading(false);
         }
     }
+  };
+
+  const startNewProblem = () => {
+    setMessages([]);
+    resetInput();
+    setProblemImageBase64(null);
+    setError('');
   };
 
   return (
@@ -174,8 +187,8 @@ export function AIHintGenerator() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Ask a follow-up question..."
-                disabled={isLoading || !!file}
-                hidden={!!file}
+                disabled={isLoading || !!file || messages.length === 0}
+                hidden={!!file || messages.length === 0}
             />
              <Button type="button" variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isLoading} className={messages.length > 0 ? 'hidden' : ''}>
                 <Upload className="h-4 w-4" />
@@ -194,11 +207,8 @@ export function AIHintGenerator() {
             {file ? 'Get Hints' : 'Send'}
           </Button>
         </form>
-         {messages.length > 0 && !file && (
-             <Button variant="outline" className="w-full mt-2" onClick={() => {
-                 setMessages([]);
-                 resetInput();
-             }}>Start New Problem</Button>
+         {messages.length > 0 && (
+             <Button variant="outline" className="w-full mt-2" onClick={startNewProblem}>Start New Problem</Button>
          )}
       </div>
     </Card>
