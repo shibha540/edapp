@@ -8,18 +8,11 @@ import type {FormEvent} from 'react';
 
 import { Input } from "@/components/ui/input";
 import { UserNav } from "@/components/user-nav";
+import { MobileNav } from "@/components/mobile-nav";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const pathname = usePathname();
-
-  const navItems = [
-    { href: "/", label: "Home", icon: Home },
-    { href: "/ai-hints", label: "AI Hints", icon: Lightbulb },
-    { href: "/news", label: "News", icon: Newspaper },
-    { href: "/leaderboard", label: "Ranks", icon: Trophy },
-  ];
 
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -59,20 +52,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-background">
         {children}
       </main>
-      <nav className="md:hidden sticky bottom-0 left-0 right-0 bg-card border-t z-30">
-        <div className="grid grid-cols-4 h-16">
-          {navItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className={`flex flex-col items-center justify-center gap-1 text-xs font-medium transition-colors ${pathname === item.href ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
-            >
-              <item.icon className="h-5 w-5" />
-              <span>{item.label}</span>
-            </Link>
-          ))}
-        </div>
-      </nav>
+      <MobileNav />
     </div>
   );
 }
