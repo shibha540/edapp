@@ -2,7 +2,7 @@
 'use client';
 
 import Link from "next/link";
-import { Home, Lightbulb, Newspaper, Trophy, Search, BookOpen } from "lucide-react";
+import { BrainCircuit, Lightbulb, Newspaper, Trophy, Search, BookOpen } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type {FormEvent} from 'react';
 
@@ -41,7 +41,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 type="search"
                 name="search"
                 placeholder="Search problems..."
-                className="w-full appearance-none bg-background pl-8 shadow-none sm:w-1/2 md:w-1/3"
+                className="w-full appearance-none bg-background pl-8 shadow-none sm:w/2 md:w/3"
                 defaultValue={searchParams.get('q') ?? ''}
               />
             </div>
