@@ -39,7 +39,7 @@ export default function ProblemDetailsPage() {
 
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 pb-16 md:pb-6">
       <Card>
         <CardContent className="p-0">
           <ProblemCard problem={problem} isDetailPage />
@@ -71,7 +71,7 @@ export default function ProblemDetailsPage() {
                       </div>
                     )}
                   </div>
-                  <div className="prose prose-sm dark:prose-invert mt-2" dangerouslySetInnerHTML={{ __html: solution.content.replace(/\n/g, '<br />').replace(/`([^`]+)`/g, '<code>$1</code>') }} />
+                  <div className="prose prose-sm dark:prose-invert mt-2" dangerouslySetInnerHTML={{ __html: solution.content.replace(/\n/g, '<br />').replace(/`([^`]+)`/g, '<code>$1</code>').replace(/```python\n([\s\S]*?)```/g, '<pre><code class="language-python">$1</code></pre>') }} />
 
                   <div className="mt-4 flex items-center gap-4">
                     <Button variant="ghost" size="sm" onClick={() => showToast('commenting on solutions')}>
@@ -88,5 +88,3 @@ export default function ProblemDetailsPage() {
     </div>
   );
 }
-
-    
