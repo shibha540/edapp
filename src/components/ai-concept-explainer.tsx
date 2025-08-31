@@ -1,35 +1,60 @@
 
 'use client';
 
-import { useState, type FormEvent } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, type FormEvent, useRef, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { BrainCircuit, Loader2, AlertCircle, Sparkles, Lightbulb, ListChecks } from 'lucide-react';
+import { BrainCircuit, Loader2, User, Sparkles, Bot } from 'lucide-react';
 import { explainConcept, type ExplainConceptOutput } from '@/ai/flows/concept-explainer';
+import { followUpOnExplanation } from '@/ai/flows/follow-up-on-explanation';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+
+type Message = {
+  role: 'user' | 'model';
+  content: string;
+};
 
 export function AIConceptExplainer() {
-  const [result, setResult] = useState<ExplainConceptOutput | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [concept, setConcept] = useState('');
+  const [inputValue, setInputValue] = useState('');
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!concept) {
-      setError('Please enter a concept to explain.');
-      return;
-    }
+    if (!inputValue.trim()) return;
 
+    const newUserMessage: Message = { role: 'user', content: inputValue };
+    setMessages(prev => [...prev, newUserMessage]);
+    setInputValue('');
     setIsLoading(true);
     setError('');
-    setResult(null);
 
     try {
-      const response = await explainConcept({ concept });
-      setResult(response);
+      if (messages.length === 0) {
+        // First message
+        const response = await explainConcept({ concept: inputValue });
+        const aiResponse: Message = { 
+          role: 'model', 
+          content: `**Explanation:**\n${response.explanation}\n\n**Analogy:**\n${response.analogy}\n\n**Key Takeaways:**\n${response.keyTakeaways.join('\n- ')}`
+        };
+        setMessages(prev => [...prev, aiResponse]);
+      } else {
+        // Follow-up message
+        const history = messages.map(m => ({ role: m.role, content: m.content }));
+        const response = await followUpOnExplanation({ history, question: inputValue });
+        const aiResponse: Message = { role: 'model', content: response.answer };
+        setMessages(prev => [...prev, aiResponse]);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
     } finally {
@@ -38,81 +63,71 @@ export function AIConceptExplainer() {
   };
 
   return (
-    <Card className="max-w-2xl mx-auto">
+    <Card className="max-w-2xl mx-auto flex flex-col h-[85vh]">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <BrainCircuit className="h-6 w-6 text-primary" />
           AI Concept Explainer
         </CardTitle>
         <CardDescription>
-          Enter a concept, and our AI will break it down for you with a simple explanation, an analogy, and key takeaways.
+          Enter a concept, and our AI will break it down for you. You can ask follow-up questions.
         </CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="concept">Concept</Label>
-            <Input 
-              id="concept" 
-              type="text" 
-              placeholder="e.g., Photosynthesis, Neural Networks, etc." 
-              value={concept}
-              onChange={(e) => setConcept(e.target.value)}
-            />
+      <CardContent ref={chatContainerRef} className="flex-1 overflow-y-auto space-y-4">
+        {messages.length === 0 && (
+          <div className="text-center text-muted-foreground">
+            <p>Ask about a concept to get started!</p>
+            <p className="text-xs">e.g., "Photosynthesis", "Neural Networks"</p>
           </div>
-        </CardContent>
-        <CardFooter className="flex flex-col items-stretch gap-4">
-          <Button type="submit" disabled={isLoading || !concept}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Explaining...
-              </>
-            ) : (
-              <>
-                <Sparkles className="mr-2 h-4 w-4" />
-                Explain Concept
-              </>
+        )}
+        {messages.map((message, index) => (
+          <div key={index} className={`flex items-start gap-3 ${message.role === 'user' ? 'justify-end' : ''}`}>
+            {message.role === 'model' && (
+              <Avatar className="h-8 w-8">
+                <AvatarFallback><Bot /></AvatarFallback>
+              </Avatar>
             )}
-          </Button>
-          {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          {result && (
-            <div className="space-y-4">
-              <Alert variant="default" className="bg-background">
-                  <Lightbulb className="h-4 w-4" />
-                  <AlertTitle>Explanation</AlertTitle>
-                  <AlertDescription>
-                      <p className="prose prose-sm dark:prose-invert">{result.explanation}</p>
-                  </AlertDescription>
-              </Alert>
-              <Alert variant="default" className="bg-background">
-                  <Sparkles className="h-4 w-4" />
-                  <AlertTitle>Analogy</AlertTitle>
-                  <AlertDescription>
-                     <p className="prose prose-sm dark:prose-invert">{result.analogy}</p>
-                  </AlertDescription>
-              </Alert>
-              <Alert variant="default" className="bg-background">
-                  <ListChecks className="h-4 w-4" />
-                  <AlertTitle>Key Takeaways</AlertTitle>
-                  <AlertDescription>
-                    <ul className="prose prose-sm dark:prose-invert list-disc pl-5">
-                      {result.keyTakeaways.map((takeaway, index) => (
-                        <li key={index}>{takeaway}</li>
-                      ))}
-                    </ul>
-                  </AlertDescription>
-              </Alert>
+            <div className={`rounded-lg px-4 py-2 max-w-[85%] ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                <div className="prose prose-sm dark:prose-invert" dangerouslySetInnerHTML={{ __html: message.content.replace(/\n/g, '<br />') }} />
             </div>
-          )}
-        </CardFooter>
-      </form>
+            {message.role === 'user' && (
+              <Avatar className="h-8 w-8">
+                  <AvatarFallback><User /></AvatarFallback>
+              </Avatar>
+            )}
+          </div>
+        ))}
+         {isLoading && (
+            <div className="flex items-start gap-3">
+                <Avatar className="h-8 w-8">
+                    <AvatarFallback><Bot /></AvatarFallback>
+                </Avatar>
+                <div className="rounded-lg px-4 py-2 bg-muted">
+                    <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                </div>
+            </div>
+        )}
+        {error && (
+            <Alert variant="destructive">
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+            </Alert>
+        )}
+      </CardContent>
+      <div className="p-4 border-t">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          <Input
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder="Ask a follow-up question or new concept..."
+            disabled={isLoading}
+          />
+          <Button type="submit" disabled={isLoading || !inputValue.trim()}>
+            <Sparkles className="mr-2 h-4 w-4" />
+            Send
+          </Button>
+        </form>
+      </div>
     </Card>
   );
 }
