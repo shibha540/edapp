@@ -16,21 +16,6 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, MessageSquare } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
-const mockSolutions = [
-  {
-    id: 'sol1',
-    user: { name: 'Expert Coder', avatar: 'https://i.pravatar.cc/150?u=expert' },
-    content: 'You should definitely use the `useCallback` hook to memoize the function that you pass to your FlatList items. This prevents re-renders and will improve performance.',
-    isAccepted: true,
-  },
-  {
-    id: 'sol2',
-    user: { name: 'Jane Doe', avatar: 'https://i.pravatar.cc/150?u=jane' },
-    content: 'Also make sure your images have a fixed width and height to prevent them from re-calculating their size on render. This is a common performance bottleneck.',
-    isAccepted: false,
-  },
-];
-
 export default function ProblemDetailsPage() {
   const params = useParams();
   const problemId = params.id as string;
@@ -40,6 +25,8 @@ export default function ProblemDetailsPage() {
   if (!problem) {
     return <p>Problem not found.</p>;
   }
+
+  const solutions = problem.solutions || [];
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -51,13 +38,13 @@ export default function ProblemDetailsPage() {
       
       <Card>
         <CardHeader>
-          <CardTitle>Solutions ({mockSolutions.length})</CardTitle>
+          <CardTitle>Solutions ({solutions.length})</CardTitle>
           <CardDescription>
             Here are the solutions provided by the community. The accepted solution is marked with a green check.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {mockSolutions.map((solution, index) => (
+          {solutions.map((solution, index) => (
             <div key={solution.id}>
               <div className="flex gap-4">
                 <Avatar>
@@ -74,7 +61,8 @@ export default function ProblemDetailsPage() {
                       </div>
                     )}
                   </div>
-                  <p className="text-muted-foreground mt-2">{solution.content}</p>
+                  <div className="prose prose-sm dark:prose-invert mt-2" dangerouslySetInnerHTML={{ __html: solution.content.replace(/\n/g, '<br />').replace(/`([^`]+)`/g, '<code>$1</code>') }} />
+
                   <div className="mt-4 flex items-center gap-4">
                     <Button variant="ghost" size="sm">
                        <MessageSquare className="mr-2 h-4 w-4" /> Comment
@@ -82,7 +70,7 @@ export default function ProblemDetailsPage() {
                   </div>
                 </div>
               </div>
-              {index < mockSolutions.length - 1 && <Separator className="my-4" />}
+              {index < solutions.length - 1 && <Separator className="my-4" />}
             </div>
           ))}
         </CardContent>
@@ -90,3 +78,5 @@ export default function ProblemDetailsPage() {
     </div>
   );
 }
+
+    
