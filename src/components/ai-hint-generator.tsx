@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Lightbulb, Upload, Loader2, AlertCircle, Bot, User, Sparkles } from 'lucide-react';
+import { Lightbulb, Upload, Loader2, Bot, User, Sparkles } from 'lucide-react';
 import { aiPoweredHintsForProblems } from '@/ai/flows/ai-powered-hints-for-problems';
 import { followUpOnExplanation } from '@/ai/flows/follow-up-on-explanation';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
@@ -66,8 +66,10 @@ export function AIHintGenerator() {
     let newUserMessage: Message;
 
     if (file) {
-      newUserMessage = { role: 'user', content: 'Here is my problem:', imagePreview: imagePreviewForInput };
+      const userQuestion = inputValue.trim() || 'Please provide hints for the problem in the image.';
+      newUserMessage = { role: 'user', content: userQuestion, imagePreview: imagePreviewForInput };
       setMessages(prev => [...prev, newUserMessage]);
+      setInputValue(''); // Clear input after sending
 
       try {
         const reader = new FileReader();
@@ -76,7 +78,7 @@ export function AIHintGenerator() {
           try {
             const base64data = reader.result as string;
             setProblemImageBase64(base64data); // Save for follow-ups
-            const response = await aiPoweredHintsForProblems({ problemImage: base64data });
+            const response = await aiPoweredHintsForProblems({ problemImage: base64data, question: userQuestion });
             const aiResponse: Message = { role: 'model', content: response.hints };
             setMessages(prev => [...prev, aiResponse]);
             resetInput();
@@ -132,13 +134,13 @@ export function AIHintGenerator() {
           AI-Powered Hints
         </CardTitle>
         <CardDescription>
-          Upload an image of a problem to get hints, then ask follow-up questions.
+          Upload an image of a problem, ask a question, then ask follow-up questions.
         </CardDescription>
       </CardHeader>
        <CardContent ref={chatContainerRef} className="flex-1 overflow-y-auto space-y-4">
         {messages.length === 0 && (
           <div className="text-center text-muted-foreground">
-            <p>Upload an image of a problem to get started!</p>
+            <p>Upload an image and ask a question to get started!</p>
           </div>
         )}
         {messages.map((message, index) => (
@@ -181,31 +183,32 @@ export function AIHintGenerator() {
         )}
       </CardContent>
       <div className="p-4 border-t">
-        <form onSubmit={handleSubmit} className="flex items-center gap-2">
-            <Input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Ask a follow-up question..."
-                disabled={isLoading || !!file || messages.length === 0}
-                hidden={!!file || messages.length === 0}
-            />
-             <Button type="button" variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isLoading} className={messages.length > 0 ? 'hidden' : ''}>
-                <Upload className="h-4 w-4" />
-                <span className="sr-only">Upload Image</span>
-            </Button>
-             <Input id="problem-image" type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef} className="hidden" />
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+                <Button type="button" variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isLoading || messages.length > 0}>
+                    <Upload className="h-4 w-4" />
+                    <span className="sr-only">Upload Image</span>
+                </Button>
+                <Input id="problem-image" type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef} className="hidden" />
 
-            {imagePreviewForInput && (
-                 <div className="relative w-24 aspect-square overflow-hidden rounded-md border p-1">
+                <Input
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder={messages.length === 0 ? "Ask a question about the image..." : "Ask a follow-up question..."}
+                    disabled={isLoading || (messages.length > 0 && !problemImageBase64)}
+                />
+            
+                <Button type="submit" disabled={isLoading || (!file && !inputValue.trim())}>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Send
+                </Button>
+            </div>
+             {imagePreviewForInput && (
+                 <div className="relative w-24 aspect-square overflow-hidden rounded-md border p-1 self-start">
                     <Image src={imagePreviewForInput} alt="Input preview" fill className="object-contain" />
                  </div>
             )}
-          
-          <Button type="submit" disabled={isLoading || (!file && !inputValue.trim())}>
-            <Sparkles className="mr-2 h-4 w-4" />
-            {file ? 'Get Hints' : 'Send'}
-          </Button>
         </form>
          {messages.length > 0 && (
              <Button variant="outline" className="w-full mt-2" onClick={startNewProblem}>Start New Problem</Button>

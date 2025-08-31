@@ -16,6 +16,7 @@ const AiPoweredHintsForProblemsInputSchema = z.object({
     .describe(
       "A photo of a math problem or code error, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
+  question: z.string().optional().describe('An optional question about the problem in the image.'),
 });
 export type AiPoweredHintsForProblemsInput = z.infer<typeof AiPoweredHintsForProblemsInputSchema>;
 
@@ -35,6 +36,8 @@ const prompt = ai.definePrompt({
   prompt: `You are an AI assistant that provides hints for math problems or code errors.
 
   Please analyze the image of the problem or error and provide helpful hints to guide the student towards a solution.
+
+  {{#if question}}The user has a specific question: {{{question}}}{{/if}}
 
   Image: {{media url=problemImage}}
   `,
