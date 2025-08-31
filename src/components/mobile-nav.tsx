@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useSidebar } from "./ui/sidebar";
 import { SidebarContent as MobileSidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "./ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useEffect, useState } from "react";
 
 const navItems = [
     { href: "/", label: "Home", icon: Home },
@@ -21,8 +22,13 @@ export function MobileNav() {
     const pathname = usePathname();
     const { openMobile, setOpenMobile } = useSidebar();
     const isMobile = useIsMobile();
+    const [isClient, setIsClient] = useState(false);
 
-    if (!isMobile) {
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    if (!isClient || !isMobile) {
         return null;
     }
 
