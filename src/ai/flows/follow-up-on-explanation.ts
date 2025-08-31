@@ -10,7 +10,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const FollowUpOnExplanationInputSchema = z.object({
+const FollowUpOnExplanationInputSchema = z.object({
   history: z.array(z.object({
     role: z.enum(['user', 'model']),
     content: z.string(),
@@ -19,7 +19,7 @@ export const FollowUpOnExplanationInputSchema = z.object({
 });
 export type FollowUpOnExplanationInput = z.infer<typeof FollowUpOnExplanationInputSchema>;
 
-export const FollowUpOnExplanationOutputSchema = z.object({
+const FollowUpOnExplanationOutputSchema = z.object({
   answer: z.string().describe('The answer to the follow-up question.'),
 });
 export type FollowUpOnExplanationOutput = z.infer<typeof FollowUpOnExplanationOutputSchema>;
