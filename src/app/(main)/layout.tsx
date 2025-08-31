@@ -41,7 +41,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="flex flex-col min-h-screen w-full">
       <header className="flex h-16 items-center gap-4 border-b bg-card px-4 md:px-6 sticky top-0 z-30">
         <div className="flex items-center gap-2">
-            <SidebarTrigger className="md:hidden" />
+            <SidebarTrigger />
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <BookOpen className="h-6 w-6 text-primary" />
               <span className="hidden sm:inline-block">EduConnect</span>
@@ -65,17 +65,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <UserNav />
       </header>
       <div className="flex flex-1">
-        <Sidebar className="hidden md:block" collapsible="icon">
+        <Sidebar>
           <SidebarContent>
             <SidebarMenu>
                 {navItems.map((item) => (
                     <SidebarMenuItem key={item.label}>
-                        <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
-                            <Link href={item.href}>
-                                <item.icon />
-                                <span>{item.label}</span>
-                            </Link>
-                        </SidebarMenuButton>
+                         <Link href={item.href} legacyBehavior passHref>
+                            <SidebarMenuButton asChild isActive={pathname === item.href}>
+                                <div>
+                                    <item.icon />
+                                    <span>{item.label}</span>
+                                </div>
+                            </SidebarMenuButton>
+                        </Link>
                     </SidebarMenuItem>
                 ))}
             </SidebarMenu>

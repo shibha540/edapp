@@ -7,6 +7,7 @@ import { Home, Lightbulb, Newspaper, Trophy, BrainCircuit } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useSidebar } from "./ui/sidebar";
 import { SidebarContent as MobileSidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "./ui/sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const navItems = [
     { href: "/", label: "Home", icon: Home },
@@ -19,10 +20,15 @@ const navItems = [
 export function MobileNav() {
     const pathname = usePathname();
     const { openMobile, setOpenMobile } = useSidebar();
+    const isMobile = useIsMobile();
+
+    if (!isMobile) {
+        return null;
+    }
 
     return (
         <>
-            <nav className="md:hidden sticky bottom-0 left-0 right-0 bg-card border-t z-30">
+            <nav className="sticky bottom-0 left-0 right-0 bg-card border-t z-30">
                 <div className="grid grid-cols-5 h-16">
                 {navItems.map((item) => (
                     <Link
@@ -44,8 +50,10 @@ export function MobileNav() {
                                 <SidebarMenuItem key={item.label}>
                                     <Link href={item.href} legacyBehavior passHref>
                                         <SidebarMenuButton asChild isActive={pathname === item.href} onClick={() => setOpenMobile(false)}>
-                                            <item.icon />
-                                            <span>{item.label}</span>
+                                            <div>
+                                                <item.icon />
+                                                <span>{item.label}</span>
+                                            </div>
                                         </SidebarMenuButton>
                                     </Link>
                                 </SidebarMenuItem>
