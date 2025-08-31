@@ -256,13 +256,15 @@ export type LeaderboardUser = {
 };
 
 export const leaderboardUsers: LeaderboardUser[] = [
-  { rank: 1, name: 'Charlie Brown', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026706d', points: 12540, badges: ['Top Helper', 'Math Whiz', '100+ Solutions'] },
-  { rank: 2, name: 'Bob Williams', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026705d', points: 11820, badges: ['Code Master', 'Weekly Top Solver'] },
-  { rank: 3, name: 'Grace Hopper', avatar: 'https://i.pravatar.cc/150?u=gracehopper', points: 9980, badges: ['Bug Hunter', 'Community Star'] },
-  { rank: 4, name: 'Alan Turing', avatar: 'https://i.pravatar.cc/150?u=alanturing', points: 8500, badges: ['Code Cracker'] },
-  { rank: 5, name: 'Alice Johnson', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d', points: 7650, badges: ['First 10 Solutions'] },
-  { rank: 6, name: 'Diana Prince', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026707d', points: 6200, badges: [] },
-  { rank: 7, name: 'Isaac Newton', avatar: 'https://i.pravatar.cc/150?u=isaacnewton', points: 5430, badges: ['Physics Guru'] },
+  { rank: 1, name: 'Priya Sharma', avatar: 'https://i.pravatar.cc/150?u=priya', points: 12540, badges: ['Top Helper', 'Math Whiz', '100+ Solutions'] },
+  { rank: 2, name: 'Rohan Gupta', avatar: 'https://i.pravatar.cc/150?u=rohan', points: 11820, badges: ['Code Master', 'Weekly Top Solver'] },
+  { rank: 3, name: 'Anjali Mehta', avatar: 'https://i.pravatar.cc/150?u=anjali', points: 9980, badges: ['Bug Hunter', 'Community Star'] },
+  { rank: 4, name: 'Vikram Singh', avatar: 'https://i.pravatar.cc/150?u=vikram', points: 8500, badges: ['Code Cracker'] },
+  { rank: 5, name: 'Sneha Patel', avatar: 'https://i.pravatar.cc/150?u=sneha', points: 7650, badges: ['First 10 Solutions'] },
+  { rank: 6, name: 'Arjun Kumar', avatar: 'https://i.pravatar.cc/150?u=arjun', points: 6200, badges: [] },
+  { rank: 7, name: 'Isha Reddy', avatar: 'https://i.pravatar.cc/150?u=isha', points: 5430, badges: ['Physics Guru'] },
 ];
+
+    
 
     
